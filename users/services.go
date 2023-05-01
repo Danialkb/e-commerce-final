@@ -18,6 +18,22 @@ type SignedDetails struct {
 
 var SECRET_KEY = os.Getenv("SECRET_KEY")
 
+type UserServiceInterface interface {
+	CreateUser(user *User) error
+}
+
+type UserServiceV1 struct {
+	userRepos UserReposInterface
+}
+
+func (u UserServiceV1) CreateUser(user *User) error {
+	return u.userRepos.CreateUser(user)
+}
+
+func NewUserService() UserServiceV1 {
+	return UserServiceV1{userRepos: NewUserRepos()}
+}
+
 func TokenGenerator(email string, firstname string, lastname string, Id int) (signedtoken string, signedrefreshtoken string, err error) {
 	claims := &SignedDetails{
 		Email:     email,
