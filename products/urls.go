@@ -24,18 +24,7 @@ func SetupRouter(pc *ProductController, cc *CategoryController) *gin.Engine {
 
 // How to use? -> for Danial
 //func main() {
-//	r := gin.Default()
-//
-//	productService := products.NewProductService()
-//	productController := products.NewProductController(productService)
-//
-//	categoryService := products.NewCategoryService()
-//	categoryController := products.NewCategoryController(categoryService)
-//
-//	products.RegisterRoutes(r, productController, categoryController)
-//
-//	err := r.Run(":8080")
-//	if err != nil {
-//		panic(err)
-//	}
+//	router := gin.Default()
+//	controllers.SetupRouter(router)
+//	router.Run(":8080")
 //}
