@@ -27,6 +27,7 @@ type UserServiceV1 struct {
 }
 
 func (u UserServiceV1) CreateUser(user *User) error {
+	user.Password = HashPassword(user.Password)
 	return u.userRepos.CreateUser(user)
 }
 

@@ -6,9 +6,9 @@ import (
 
 type User struct {
 	gorm.Model
-	FirstName string `gorm:"not null;size:30"`
-	LastName  string `gorm:"not null;size:30"`
-	Password  string `gorm:"not null;size:255"`
-	Email     string `gorm:"not null;size:255;unique"`
-	Phone     string `gorm:"not null;size:255;unique"`
+	FirstName string `gorm:"not null;size:30" json:"first_name"`
+	LastName  string `gorm:"not null;size:30" json:"last_name"`
+	Password  string `gorm:"not null;size:255" json:"-"`
+	Email     string `gorm:"not null;size:255;unique" json:"email"`
+	//Phone     string `gorm:"not null;size:255;unique" json:"phone"`
 }
