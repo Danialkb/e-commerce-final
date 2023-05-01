@@ -12,14 +12,23 @@ type SignedDetails struct {
 	Email     string
 	FirstName string
 	LastName  string
-	Id        int
+	Id        uint
 	jwt.StandardClaims
+}
+
+type InvalidCredentialsError struct {
+	msg string
+}
+
+func (e *InvalidCredentialsError) Error() string {
+	return e.msg
 }
 
 var SECRET_KEY = os.Getenv("SECRET_KEY")
 
 type UserServiceInterface interface {
 	CreateUser(user *User) error
+	LogIn(user *User) (string, string, error)
 }
 
 type UserServiceV1 struct {
@@ -31,16 +40,38 @@ func (u UserServiceV1) CreateUser(user *User) error {
 	return u.userRepos.CreateUser(user)
 }
 
+func (u UserServiceV1) LogIn(user *User) (string, string, error) {
+	givenpwd := user.Password
+	user, err := u.userRepos.GetUser(user.Email)
+	if err != nil {
+		return "", "", err
+	}
+
+	valid, msg := ComparePasswords(user.Password, givenpwd)
+
+	if valid == false {
+		return "", "", &InvalidCredentialsError{msg: msg}
+	}
+
+	access, refresh, err := TokenGenerator(user)
+	if err != nil {
+		return "", "", err
+	}
+
+	return access, refresh, nil
+
+}
+
 func NewUserService() UserServiceV1 {
 	return UserServiceV1{userRepos: NewUserRepos()}
 }
 
-func TokenGenerator(email string, firstname string, lastname string, Id int) (signedtoken string, signedrefreshtoken string, err error) {
+func TokenGenerator(user *User) (string, string, error) {
 	claims := &SignedDetails{
-		Email:     email,
-		FirstName: firstname,
-		LastName:  lastname,
-		Id:        Id,
+		Email:     user.Email,
+		FirstName: user.FirstName,
+		LastName:  user.LastName,
+		Id:        user.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
 		},
@@ -57,7 +88,7 @@ func TokenGenerator(email string, firstname string, lastname string, Id int) (si
 	refreshToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshClaims).SignedString([]byte(SECRET_KEY))
 	if err != nil {
 		log.Panicln(err)
-		return
+		return "", "", err
 	}
 	return token, refreshToken, err
 }
@@ -71,11 +102,11 @@ func HashPassword(password string) string {
 }
 
 func ComparePasswords(hashedpwd string, givenpwd string) (bool, string) {
-	err := bcrypt.CompareHashAndPassword([]byte(givenpwd), []byte(hashedpwd))
+	err := bcrypt.CompareHashAndPassword([]byte(hashedpwd), []byte(givenpwd))
 	valid := true
 	msg := ""
 	if err != nil {
-		msg = "Username or password is incorrect"
+		msg = "Email or password is incorrect"
 		valid = false
 	}
 	return valid, msg

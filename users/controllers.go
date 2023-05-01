@@ -1,6 +1,8 @@
 package users
 
 import (
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -23,5 +25,33 @@ func (u UserController) CreateUser(c *gin.Context) {
 		} else {
 			c.JSON(http.StatusCreated, gin.H{"user": user})
 		}
+	}
+}
+
+func (u UserController) LogIn(c *gin.Context) {
+	var user User
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	} else {
+		fmt.Println(user)
+		access, refresh, err := u.userService.LogIn(&user)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		response := LoginResponse{
+			AccessToken:  access,
+			RefreshToken: refresh,
+		}
+		jsonResponse, err := json.Marshal(response)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.Header("Content-Type", "application/json")
+		c.String(http.StatusOK, string(jsonResponse))
+
 	}
 }
