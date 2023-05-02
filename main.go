@@ -17,4 +17,5 @@ func main() {
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 	//t, b, _ := users.TokenGenerator("bidaybek044@gmail.com", "Danial", "Bidaibek", "1234")
+	//bakha chort
 }
