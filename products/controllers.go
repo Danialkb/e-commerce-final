@@ -8,26 +8,22 @@ import (
 )
 
 type ProductController struct {
-	productService productService
+	productService ProductServiceInterface
 }
 
 type CategoryController struct {
-	categoryService categoryService
+	categoryService CategoryServiceV1
 }
 
-func NewProductController(ps productService) *ProductController {
-	return &ProductController{
-		productService: ps,
-	}
+func NewProductController() ProductController {
+	return ProductController{productService: NewProductService()}
 }
 
-func NewCategoryController(cs categoryService) *CategoryController {
-	return &CategoryController{
-		categoryService: cs,
-	}
+func NewCategoryController() CategoryController {
+	return CategoryController{categoryService: NewCategoryService()}
 }
 
-func (pc *ProductController) CreateProduct(c *gin.Context) {
+func (pc ProductController) CreateProduct(c *gin.Context) {
 	var product Product
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -42,7 +38,7 @@ func (pc *ProductController) CreateProduct(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"data": product})
 }
 
-func (pc *ProductController) GetProductByID(c *gin.Context) {
+func (pc ProductController) GetProductByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
@@ -58,7 +54,7 @@ func (pc *ProductController) GetProductByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": product})
 }
 
-func (pc *ProductController) UpdateProduct(c *gin.Context) {
+func (pc ProductController) UpdateProduct(c *gin.Context) {
 	var product Product
 	if err := c.ShouldBindJSON(&product); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -73,7 +69,7 @@ func (pc *ProductController) UpdateProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": product})
 }
 
-func (pc *ProductController) DeleteProduct(c *gin.Context) {
+func (pc ProductController) DeleteProduct(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
@@ -88,7 +84,7 @@ func (pc *ProductController) DeleteProduct(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Product deleted successfully"})
 }
 
-func (cc *CategoryController) CreateCategory(c *gin.Context) {
+func (cc CategoryController) CreateCategory(c *gin.Context) {
 	var category Category
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -103,7 +99,7 @@ func (cc *CategoryController) CreateCategory(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"data": category})
 }
 
-func (cc *CategoryController) GetCategoryByID(c *gin.Context) {
+func (cc CategoryController) GetCategoryByID(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
@@ -119,7 +115,7 @@ func (cc *CategoryController) GetCategoryByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": category})
 }
 
-func (cc *CategoryController) UpdateCategory(c *gin.Context) {
+func (cc CategoryController) UpdateCategory(c *gin.Context) {
 	var category Category
 	if err := c.ShouldBindJSON(&category); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -134,10 +130,10 @@ func (cc *CategoryController) UpdateCategory(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": category})
 }
 
-func (cc *CategoryController) DeleteCategory(c *gin.Context) {
+func (cc CategoryController) DeleteCategory(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid category ID"})
 		return
 	}
 

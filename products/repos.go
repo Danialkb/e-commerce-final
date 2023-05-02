@@ -1,71 +1,85 @@
 package products
 
-import "gorm.io/gorm"
+import (
+	"e-commerce-final/settings"
+	"gorm.io/gorm"
+	"log"
+)
 
-type ProductRepository interface {
+type ProductRepositoryInterface interface {
 	CreateProduct(*Product) error
 	GetProductByID(uint) (*Product, error)
 	UpdateProduct(*Product) error
 	DeleteProduct(uint) error
 }
-type CategoryRepository interface {
+type CategoryRepositoryInterface interface {
 	CreateCategory(category *Category) error
 	GetCategoryByID(uint) (*Category, error)
 	UpdateCategory(*Category) error
 	DeleteCategory(uint) error
 }
 
-type productRepository struct {
-	db *gorm.DB
+type ProductRepositoryV1 struct {
+	DB *gorm.DB
 }
 
-type categoryRepository struct {
-	db *gorm.DB
+type CategoryRepositoryV1 struct {
+	DB *gorm.DB
 }
 
-func NewProductRepository(db *gorm.DB) ProductRepository {
-	return &productRepository{db: db}
+func NewProductRepository() *ProductRepositoryV1 {
+	db, err := settings.DbSetup()
+	if err != nil {
+		log.Fatal(err)
+		return &ProductRepositoryV1{}
+	}
+	return &ProductRepositoryV1{DB: db}
 }
 
-func (r *productRepository) CreateProduct(product *Product) error {
-	return r.db.Create(product).Error
+func (p *ProductRepositoryV1) CreateProduct(product *Product) error {
+	return p.DB.Create(product).Error
 }
 
-func (r *productRepository) UpdateProduct(product *Product) error {
-	return r.db.Save(product).Error
+func (p *ProductRepositoryV1) UpdateProduct(product *Product) error {
+	return p.DB.Save(product).Error
 }
 
-func (r *productRepository) DeleteProduct(id uint) error {
-	return r.db.Delete(&Product{}, id).Error
+func (p *ProductRepositoryV1) DeleteProduct(id uint) error {
+	return p.DB.Delete(&Product{}, id).Error
 }
 
-func (r *productRepository) GetProductByID(id uint) (*Product, error) {
+func (p *ProductRepositoryV1) GetProductByID(id uint) (*Product, error) {
 	var product Product
-	if err := r.db.First(&product, id).Error; err != nil {
+	if err := p.DB.First(&product, id).Error; err != nil {
 		return nil, err
 	}
 	return &product, nil
 }
 
-func NewCategoryRepository(db *gorm.DB) CategoryRepository {
-	return &categoryRepository{db: db}
+func NewCategoryRepository() *CategoryRepositoryV1 {
+	db, err := settings.DbSetup()
+	if err != nil {
+		log.Fatal(err)
+		return &CategoryRepositoryV1{}
+	}
+	return &CategoryRepositoryV1{DB: db}
 }
 
-func (r *categoryRepository) CreateCategory(category *Category) error {
-	return r.db.Create(category).Error
+func (c *CategoryRepositoryV1) CreateCategory(category *Category) error {
+	return c.DB.Create(category).Error
 }
 
-func (r *categoryRepository) GetCategoryByID(id uint) (*Category, error) {
+func (c *CategoryRepositoryV1) GetCategoryByID(id uint) (*Category, error) {
 	var category Category
-	if err := r.db.First(&category, id).Error; err != nil {
+	if err := c.DB.First(&category, id).Error; err != nil {
 		return nil, err
 	}
 	return &category, nil
 }
-func (r *categoryRepository) UpdateCategory(category *Category) error {
-	return r.db.Save(category).Error
+func (c *CategoryRepositoryV1) UpdateCategory(category *Category) error {
+	return c.DB.Save(category).Error
 }
 
-func (r *categoryRepository) DeleteCategory(id uint) error {
-	return r.db.Delete(&Category{}, id).Error
+func (c *CategoryRepositoryV1) DeleteCategory(id uint) error {
+	return c.DB.Delete(&Category{}, id).Error
 }

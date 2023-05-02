@@ -1,62 +1,64 @@
 package products
 
-type ProductService interface {
+type ProductServiceInterface interface {
 	CreateProduct(*Product) error
 	GetProductByID(uint) (*Product, error)
 	UpdateProduct(*Product) error
 	DeleteProduct(uint) error
 }
 
-type CategoryService interface {
+type CategoryServiceInterface interface {
 	CreateCategory(category *Category) error
 	GetCategoryByID(uint) (*Category, error)
 	UpdateCategory(*Category) error
 	DeleteCategory(uint) error
 }
-type productService struct {
-	pr ProductRepository
+
+type ProductServiceV1 struct {
+	productRepos ProductRepositoryInterface
 }
 
-type categoryService struct {
-	cr CategoryRepository
+type CategoryServiceV1 struct {
+	categoryRepos CategoryRepositoryInterface
 }
 
-func NewProductService(pr ProductRepository) ProductService {
-	return &productService{pr: pr}
+func NewProductService() ProductServiceV1 {
+	return ProductServiceV1{productRepos: NewProductRepository()}
 }
 
-func NewCategoryService(cr CategoryRepository) CategoryService {
-	return &categoryService{cr: cr}
+func NewCategoryService() CategoryServiceV1 {
+	return CategoryServiceV1{categoryRepos: NewCategoryRepository()}
+
 }
 
-func (p *productService) CreateProduct(product *Product) error {
-	return p.pr.CreateProduct(product)
+func (p ProductServiceV1) CreateProduct(product *Product) error {
+	return p.productRepos.CreateProduct(product)
 }
 
-func (p *productService) GetProductByID(id uint) (*Product, error) {
-	return p.pr.GetProductByID(id)
+func (p ProductServiceV1) GetProductByID(id uint) (*Product, error) {
+	return p.productRepos.GetProductByID(id)
 }
 
-func (p *productService) UpdateProduct(product *Product) error {
-	return p.pr.UpdateProduct(product)
+func (p ProductServiceV1) UpdateProduct(product *Product) error {
+	return p.productRepos.UpdateProduct(product)
 }
 
-func (p *productService) DeleteProduct(id uint) error {
-	return p.pr.DeleteProduct(id)
+func (p ProductServiceV1) DeleteProduct(id uint) error {
+	return p.productRepos.DeleteProduct(id)
 }
 
-func (c *categoryService) CreateCategory(category *Category) error {
-	return c.cr.CreateCategory(category)
+func (c CategoryServiceV1) CreateCategory(category *Category) error {
+	return c.categoryRepos.CreateCategory(category)
 }
 
-func (c *categoryService) GetCategoryByID(id uint) (*Category, error) {
-	return c.cr.GetCategoryByID(id)
+func (c CategoryServiceV1) GetCategoryByID(id uint) (*Category, error) {
+	return c.categoryRepos.GetCategoryByID(id)
 }
 
-func (c *categoryService) UpdateCategory(category *Category) error {
-	return c.cr.UpdateCategory(category)
+func (c CategoryServiceV1) UpdateCategory(category *Category) error {
+	return c.categoryRepos.UpdateCategory(category)
 }
 
-func (c *categoryService) DeleteCategory(id uint) error {
-	return c.cr.DeleteCategory(id)
+func (c CategoryServiceV1) DeleteCategory(id uint) error {
+	return c.categoryRepos.DeleteCategory(id)
 }
