@@ -7,14 +7,17 @@ import (
 
 type Product struct {
 	gorm.Model
-	User     users.User `gorm:"foreignKey:id"`
-	Category Category   `gorm:"foreignKey:id"`
-	Title    string     `gorm:"size: 150;unique"`
+	User     users.User `gorm:"foreignKey:user"`
+	Category Category   `gorm:"foreignKey:category"`
+	//CategoryID uint
+	Title string `gorm:"size: 150;unique"`
 
-	Body      string `json:"body"`
-	MainImage string `json:"main_image"`
-	IsActive  bool   `json:"is_active"`
-	IsTop     bool   `json:"is_top"`
+	Body       string `json:"body"`
+	MainImage  string `json:"main_image"`
+	IsActive   bool   `json:"is_active"`
+	IsTop      bool   `json:"is_top"`
+	UserID     uint   `gorm:"column:user_id"`
+	CategoryID uint   `gorm:"column:category_id"`
 }
 
 type Category struct {

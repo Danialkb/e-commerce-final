@@ -3,6 +3,7 @@ package main
 import (
 	"e-commerce-final/products"
 	"e-commerce-final/settings"
+	"e-commerce-final/users"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -17,7 +18,12 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.AutoMigrate(&products.Product{}, &products.Category{})
+	db.AutoMigrate(&products.Product{}, &products.Category{}, &users.User{})
+
+	userController := users.NewUserController()
+
+	r.POST("/users", userController.CreateUser)
+	r.POST("/users/token", userController.LogIn)
 
 	r.POST("/products", pc.CreateProduct)
 	r.GET("/products/:id", pc.GetProductByID)
