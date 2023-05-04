@@ -1,6 +1,8 @@
 package comments
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type Comment struct {
 	gorm.Model

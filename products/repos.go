@@ -14,6 +14,7 @@ type ProductRepositoryInterface interface {
 	DeleteProduct(uint) error
 	GetProducts() ([]Product, error)
 	GetCommentsByProductId(uint) ([]*comments.Comment, error)
+	GetProductAverageRating(uint) (float32, error)
 }
 type CategoryRepositoryInterface interface {
 	CreateCategory(category *Category) error
@@ -38,6 +39,19 @@ func NewProductRepository() *ProductRepositoryV1 {
 		return &ProductRepositoryV1{}
 	}
 	return &ProductRepositoryV1{DB: db}
+}
+
+func (p *ProductRepositoryV1) GetProductAverageRating(id uint) (float32, error) {
+	var ratingAvg float32
+	result := p.DB.Table("ratings").
+		Select("ROUND(AVG(value)) as rating_average").
+		Joins("JOIN products on ratings.product_id = products.id").
+		Where("products.id = ?", id).
+		Scan(&ratingAvg)
+	if result.Error != nil {
+		return -1, nil
+	}
+	return ratingAvg, nil
 }
 
 func (p *ProductRepositoryV1) CreateProduct(product *Product) error {

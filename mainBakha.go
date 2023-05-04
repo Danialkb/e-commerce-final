@@ -1,9 +1,9 @@
-<<<<<<< HEAD
 package main
 
 import (
 	"e-commerce-final/comments"
 	"e-commerce-final/products"
+	"e-commerce-final/ratings"
 	"e-commerce-final/settings"
 	"e-commerce-final/users"
 	"github.com/gin-gonic/gin"
@@ -16,11 +16,12 @@ func main() {
 	pc := products.NewProductController()
 	cc := products.NewCategoryController()
 	com_c := comments.NewCommentController()
+	rc := ratings.NewRatingController()
 	db, err := settings.DbSetup()
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.AutoMigrate(&products.Product{}, &products.Category{}, &users.User{}, &comments.Comment{})
+	db.AutoMigrate(&products.Product{}, &products.Category{}, &users.User{}, &comments.Comment{}, &ratings.Rating{})
 
 	userController := users.NewUserController()
 
@@ -33,6 +34,9 @@ func main() {
 	r.GET("/comments/:id", com_c.GetCommentByID)
 	r.DELETE("/comments/:id", com_c.DeleteComments)
 
+	//Ratings endpoints
+	r.POST("/ratings", rc.CreateRating)
+
 	// Products endpoints
 	r.GET("/products", pc.GetProducts)
 	r.GET("/products/:id/comments", pc.GetCommentsByProductId)
@@ -40,16 +44,18 @@ func main() {
 	r.GET("/products/:id", pc.GetProductByID)
 	r.PUT("/products", pc.UpdateProduct)
 	r.DELETE("/products/:id", pc.DeleteProduct)
+	r.GET("/products/:id/rating", pc.GetProductAverageRating)
 
 	// Categories endpoints
+	r.GET("/categories", cc.GetCategories)
 	r.POST("/categories", cc.CreateCategory)
 	r.GET("/categories/:id", cc.GetCategoryByID)
-	r.PUT("/categories", cc.UpdateCategory)
+	r.PUT("/categories/:id", cc.UpdateCategory)
 	r.DELETE("/categories/:id", cc.DeleteCategory)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
-=======
+
 //package main
 //
 //import (
@@ -90,4 +96,3 @@ func main() {
 //
 //	log.Fatal(http.ListenAndServe(":8080", r))
 //}
->>>>>>> d468caefc2536511cc6b6ec767921609fff805a8

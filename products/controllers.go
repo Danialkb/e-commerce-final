@@ -15,21 +15,38 @@ type CategoryController struct {
 	categoryService CategoryServiceInterface
 }
 
-func NewProductController() ProductController {
-	return ProductController{productService: NewProductService()}
+func NewProductController() *ProductController {
+	return &ProductController{productService: NewProductService()}
 }
 
-func NewCategoryController() CategoryController {
-	return CategoryController{categoryService: NewCategoryService()}
+func NewCategoryController() *CategoryController {
+	return &CategoryController{categoryService: NewCategoryService()}
 }
 
-func (pc ProductController) GetProducts(c *gin.Context) {
-	productList, _ := pc.productService.GetProducts()
-	if err := c.ShouldBindJSON(&productList); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func (pc *ProductController) GetProductAverageRating(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+	}
+
+	avgValue, err := pc.productService.GetProductAverageRating(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": avgValue})
+}
+
+func (pc *ProductController) GetProducts(c *gin.Context) {
+	//productList := make([]Product, 0)
+
+	products, err := pc.productService.GetProducts()
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Products not found"})
 		return
 	}
-	c.JSON(http.StatusOK, productList)
+
+	c.JSON(http.StatusOK, products)
 }
 
 func (pc ProductController) GetCommentsByProductId(c *gin.Context) {
@@ -205,9 +222,6 @@ func (cc CategoryController) DeleteCategory(c *gin.Context) {
 
 func (cc CategoryController) GetCategories(c *gin.Context) {
 	category_list, _ := cc.categoryService.GetCategories()
-	if err := c.ShouldBindJSON(&category_list); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
+
 	c.JSON(http.StatusOK, category_list)
 }

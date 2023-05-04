@@ -9,6 +9,7 @@ type ProductServiceInterface interface {
 	DeleteProduct(uint) error
 	GetProducts() ([]Product, error)
 	GetCommentsByProductId(uint) ([]*comments.Comment, error)
+	GetProductAverageRating(uint) (float32, error)
 }
 
 type CategoryServiceInterface interface {
@@ -27,13 +28,17 @@ type CategoryServiceV1 struct {
 	categoryRepos CategoryRepositoryInterface
 }
 
-func NewProductService() ProductServiceV1 {
-	return ProductServiceV1{productRepos: NewProductRepository()}
+func NewProductService() *ProductServiceV1 {
+	return &ProductServiceV1{productRepos: NewProductRepository()}
 }
 
-func NewCategoryService() CategoryServiceV1 {
-	return CategoryServiceV1{categoryRepos: NewCategoryRepository()}
+func NewCategoryService() *CategoryServiceV1 {
+	return &CategoryServiceV1{categoryRepos: NewCategoryRepository()}
 
+}
+
+func (p ProductServiceV1) GetProductAverageRating(id uint) (float32, error) {
+	return p.productRepos.GetProductAverageRating(id)
 }
 
 func (p ProductServiceV1) GetProducts() ([]Product, error) {
