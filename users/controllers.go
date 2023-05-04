@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type UserController struct {
@@ -26,6 +27,23 @@ func (u UserController) CreateUser(c *gin.Context) {
 			c.JSON(http.StatusCreated, gin.H{"user": user})
 		}
 	}
+}
+
+func (uc UserController) GetUserById(c *gin.Context) {
+	idStr := c.Param("user_id")
+	id, err := strconv.ParseUint(idStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid user ID"})
+		return
+	}
+
+	user := uc.userService.GetUserByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": user})
 }
 
 func (u UserController) LogIn(c *gin.Context) {
