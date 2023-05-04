@@ -12,7 +12,7 @@ type ProductController struct {
 }
 
 type CategoryController struct {
-	categoryService CategoryServiceV1
+	categoryService CategoryServiceInterface
 }
 
 func NewProductController() ProductController {
@@ -21,6 +21,30 @@ func NewProductController() ProductController {
 
 func NewCategoryController() CategoryController {
 	return CategoryController{categoryService: NewCategoryService()}
+}
+
+func (pc ProductController) GetProducts(c *gin.Context) {
+	productList, _ := pc.productService.GetProducts()
+	if err := c.ShouldBindJSON(&productList); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, productList)
+}
+
+func (pc ProductController) GetCommentsByProductId(c *gin.Context) {
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product ID"})
+		return
+	}
+	commentList, _ := pc.productService.GetCommentsByProductId(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Product not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": commentList})
 }
 
 func (pc ProductController) CreateProduct(c *gin.Context) {
@@ -143,4 +167,13 @@ func (cc CategoryController) DeleteCategory(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Category deleted successfully"})
+}
+
+func (cc CategoryController) GetCategories(c *gin.Context) {
+	category_list, _ := cc.categoryService.GetCategories()
+	if err := c.ShouldBindJSON(&category_list); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, category_list)
 }

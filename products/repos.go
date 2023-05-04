@@ -1,6 +1,7 @@
 package products
 
 import (
+	"e-commerce-final/comments"
 	"e-commerce-final/settings"
 	"gorm.io/gorm"
 	"log"
@@ -11,12 +12,15 @@ type ProductRepositoryInterface interface {
 	GetProductByID(uint) (*Product, error)
 	UpdateProduct(*Product) error
 	DeleteProduct(uint) error
+	GetProducts() ([]Product, error)
+	GetCommentsByProductId(uint) ([]*comments.Comment, error)
 }
 type CategoryRepositoryInterface interface {
 	CreateCategory(category *Category) error
 	GetCategoryByID(uint) (*Category, error)
 	UpdateCategory(*Category) error
 	DeleteCategory(uint) error
+	GetCategories() ([]Category, error)
 }
 
 type ProductRepositoryV1 struct {
@@ -48,12 +52,31 @@ func (p *ProductRepositoryV1) DeleteProduct(id uint) error {
 	return p.DB.Delete(&Product{}, id).Error
 }
 
+func (p *ProductRepositoryV1) GetProducts() ([]Product, error) {
+	products := make([]Product, 0)
+
+	if err := p.DB.Find(&products).Error; err != nil {
+		return nil, err
+	}
+
+	return products, nil
+}
+
 func (p *ProductRepositoryV1) GetProductByID(id uint) (*Product, error) {
 	var product Product
 	if err := p.DB.First(&product, id).Error; err != nil {
 		return nil, err
 	}
 	return &product, nil
+}
+
+func (p *ProductRepositoryV1) GetCommentsByProductId(id uint) ([]*comments.Comment, error) {
+	comments := make([]*comments.Comment, 0)
+	if err := p.DB.Where("product_id = ?", id).Find(&comments).Error; err != nil {
+		return nil, err
+	}
+
+	return comments, nil
 }
 
 func NewCategoryRepository() *CategoryRepositoryV1 {
@@ -63,6 +86,18 @@ func NewCategoryRepository() *CategoryRepositoryV1 {
 		return &CategoryRepositoryV1{}
 	}
 	return &CategoryRepositoryV1{DB: db}
+}
+
+func (c *CategoryRepositoryV1) GetCategories() ([]Category, error) {
+
+	categories := make([]Category, 0)
+
+	if err := c.DB.Find(&categories).Error; err != nil {
+		return nil, err
+	}
+
+	return categories, nil
+
 }
 
 func (c *CategoryRepositoryV1) CreateCategory(category *Category) error {

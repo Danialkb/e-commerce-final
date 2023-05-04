@@ -1,10 +1,14 @@
 package products
 
+import "e-commerce-final/comments"
+
 type ProductServiceInterface interface {
 	CreateProduct(*Product) error
 	GetProductByID(uint) (*Product, error)
 	UpdateProduct(*Product) error
 	DeleteProduct(uint) error
+	GetProducts() ([]Product, error)
+	GetCommentsByProductId(uint) ([]*comments.Comment, error)
 }
 
 type CategoryServiceInterface interface {
@@ -12,6 +16,7 @@ type CategoryServiceInterface interface {
 	GetCategoryByID(uint) (*Category, error)
 	UpdateCategory(*Category) error
 	DeleteCategory(uint) error
+	GetCategories() ([]Category, error)
 }
 
 type ProductServiceV1 struct {
@@ -29,6 +34,14 @@ func NewProductService() ProductServiceV1 {
 func NewCategoryService() CategoryServiceV1 {
 	return CategoryServiceV1{categoryRepos: NewCategoryRepository()}
 
+}
+
+func (p ProductServiceV1) GetProducts() ([]Product, error) {
+	return p.productRepos.GetProducts()
+}
+
+func (p ProductServiceV1) GetCommentsByProductId(id uint) ([]*comments.Comment, error) {
+	return p.productRepos.GetCommentsByProductId(id)
 }
 
 func (p ProductServiceV1) CreateProduct(product *Product) error {
@@ -61,4 +74,8 @@ func (c CategoryServiceV1) UpdateCategory(category *Category) error {
 
 func (c CategoryServiceV1) DeleteCategory(id uint) error {
 	return c.categoryRepos.DeleteCategory(id)
+}
+
+func (c CategoryServiceV1) GetCategories() ([]Category, error) {
+	return c.categoryRepos.GetCategories()
 }
