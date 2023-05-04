@@ -13,6 +13,7 @@ type SignedDetails struct {
 	FirstName string
 	LastName  string
 	Id        uint
+	UserType  string
 	jwt.StandardClaims
 }
 
@@ -29,6 +30,7 @@ var SECRET_KEY = os.Getenv("SECRET_KEY")
 type UserServiceInterface interface {
 	CreateUser(user *User) error
 	LogIn(user *User) (string, string, error)
+	GetUserByID(id uint) *User
 }
 
 type UserServiceV1 struct {
@@ -38,6 +40,10 @@ type UserServiceV1 struct {
 func (u UserServiceV1) CreateUser(user *User) error {
 	user.Password = HashPassword(user.Password)
 	return u.userRepos.CreateUser(user)
+}
+
+func (u UserServiceV1) GetUserByID(id uint) *User {
+	return u.userRepos.GetUserByID(id)
 }
 
 func (u UserServiceV1) LogIn(user *User) (string, string, error) {
@@ -72,6 +78,7 @@ func TokenGenerator(user *User) (string, string, error) {
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 		Id:        user.ID,
+		UserType:  user.UserType,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Local().Add(time.Hour * time.Duration(24)).Unix(),
 		},
