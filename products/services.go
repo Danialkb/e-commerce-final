@@ -10,6 +10,7 @@ type ProductServiceInterface interface {
 	GetProducts() ([]Product, error)
 	GetCommentsByProductId(uint) ([]*comments.Comment, error)
 	SearchByName(name string) ([]Product, error)
+	SearchByPriceRange(minPrice, maxPrice float64) ([]Product, error)
 }
 
 type CategoryServiceInterface interface {
@@ -42,6 +43,10 @@ func (p ProductServiceV1) GetProducts() ([]Product, error) {
 
 func (p ProductServiceV1) SearchByName(title string) ([]Product, error) {
 	return p.productRepos.SearchByName(title)
+}
+
+func (p ProductServiceV1) SearchByPriceRange(minPrice, maxPrice float64) ([]Product, error) {
+	return p.productRepos.SearchByPriceRange(minPrice, maxPrice)
 }
 
 func (p ProductServiceV1) GetCommentsByProductId(id uint) ([]*comments.Comment, error) {

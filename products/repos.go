@@ -15,6 +15,7 @@ type ProductRepositoryInterface interface {
 	GetProducts() ([]Product, error)
 	GetCommentsByProductId(uint) ([]*comments.Comment, error)
 	SearchByName(name string) ([]Product, error)
+	SearchByPriceRange(minPrice, maxPrice float64) ([]Product, error)
 }
 type CategoryRepositoryInterface interface {
 	CreateCategory(category *Category) error
@@ -66,6 +67,15 @@ func (p *ProductRepositoryV1) GetProducts() ([]Product, error) {
 func (ps ProductRepositoryV1) SearchByName(title string) ([]Product, error) {
 	var products []Product
 	err := ps.DB.Where("title LIKE ?", "%"+title+"%").Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
+}
+
+func (ps *ProductRepositoryV1) SearchByPriceRange(minPrice, maxPrice float64) ([]Product, error) {
+	var products []Product
+	err := ps.DB.Where("price >= ? AND price <= ?", minPrice, maxPrice).Find(&products).Error
 	if err != nil {
 		return nil, err
 	}
