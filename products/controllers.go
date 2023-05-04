@@ -2,6 +2,7 @@ package products
 
 import (
 	"github.com/gin-gonic/gin"
+	"math"
 	"net/http"
 	"strconv"
 )
@@ -46,6 +47,37 @@ func (pc *ProductController) GetProducts(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, products)
+}
+
+func (pc *ProductController) SearchByName(c *gin.Context) {
+	title := c.Query("title")
+	if title == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Name parameter is missing"})
+		return
+	}
+	products, err := pc.productService.SearchByName(title)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search for products"})
+		return
+	}
+	c.JSON(http.StatusOK, products)
+}
+
+func (pc ProductController) SearchByPriceRange(c *gin.Context) {
+	minPrice, err := strconv.ParseFloat(c.Query("min_price"), 64)
+	if err != nil {
+		minPrice = 0.0
+	}
+	maxPrice, err := strconv.ParseFloat(c.Query("max_price"), 64)
+	if err != nil {
+		maxPrice = math.MaxFloat64
+	}
+	products, err := pc.productService.SearchByPriceRange(minPrice, maxPrice)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search for products"})
+		return
+	}
 	c.JSON(http.StatusOK, products)
 }
 

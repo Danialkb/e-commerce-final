@@ -9,7 +9,12 @@ type ProductServiceInterface interface {
 	DeleteProduct(uint) error
 	GetProducts() ([]Product, error)
 	GetCommentsByProductId(uint) ([]*comments.Comment, error)
+<<<<<<< HEAD
 	GetProductAverageRating(uint) (float32, error)
+=======
+	SearchByName(name string) ([]Product, error)
+	SearchByPriceRange(minPrice, maxPrice float64) ([]Product, error)
+>>>>>>> bbc675b4d7b13b506b02105be17923e4617ff854
 }
 
 type CategoryServiceInterface interface {
@@ -32,9 +37,14 @@ func NewProductService() *ProductServiceV1 {
 	return &ProductServiceV1{productRepos: NewProductRepository()}
 }
 
+<<<<<<< HEAD
 func NewCategoryService() *CategoryServiceV1 {
 	return &CategoryServiceV1{categoryRepos: NewCategoryRepository()}
 
+=======
+func NewCategoryService() CategoryServiceV1 {
+	return CategoryServiceV1{categoryRepos: NewCategoryRepository()}
+>>>>>>> bbc675b4d7b13b506b02105be17923e4617ff854
 }
 
 func (p ProductServiceV1) GetProductAverageRating(id uint) (float32, error) {
@@ -43,6 +53,14 @@ func (p ProductServiceV1) GetProductAverageRating(id uint) (float32, error) {
 
 func (p ProductServiceV1) GetProducts() ([]Product, error) {
 	return p.productRepos.GetProducts()
+}
+
+func (p ProductServiceV1) SearchByName(title string) ([]Product, error) {
+	return p.productRepos.SearchByName(title)
+}
+
+func (p ProductServiceV1) SearchByPriceRange(minPrice, maxPrice float64) ([]Product, error) {
+	return p.productRepos.SearchByPriceRange(minPrice, maxPrice)
 }
 
 func (p ProductServiceV1) GetCommentsByProductId(id uint) ([]*comments.Comment, error) {
