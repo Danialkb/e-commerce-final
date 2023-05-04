@@ -14,6 +14,7 @@ type ProductRepositoryInterface interface {
 	DeleteProduct(uint) error
 	GetProducts() ([]Product, error)
 	GetCommentsByProductId(uint) ([]*comments.Comment, error)
+	SearchByName(name string) ([]Product, error)
 }
 type CategoryRepositoryInterface interface {
 	CreateCategory(category *Category) error
@@ -59,6 +60,15 @@ func (p *ProductRepositoryV1) GetProducts() ([]Product, error) {
 		return nil, err
 	}
 
+	return products, nil
+}
+
+func (ps ProductRepositoryV1) SearchByName(title string) ([]Product, error) {
+	var products []Product
+	err := ps.DB.Where("title LIKE ?", "%"+title+"%").Find(&products).Error
+	if err != nil {
+		return nil, err
+	}
 	return products, nil
 }
 

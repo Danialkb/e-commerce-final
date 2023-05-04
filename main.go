@@ -32,6 +32,7 @@ func main() {
 	router.DELETE("/orders/:id", oc.DeleteOrder)
 
 	router.POST("/products", pc.CreateProduct)
+	router.GET("/products/", pc.SearchByName)
 	router.GET("/products/:id", pc.GetProductByID)
 	router.PUT("/products", pc.UpdateProduct)
 	router.DELETE("/products/:id", pc.DeleteProduct)

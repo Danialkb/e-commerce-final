@@ -32,6 +32,20 @@ func (pc ProductController) GetProducts(c *gin.Context) {
 	c.JSON(http.StatusOK, productList)
 }
 
+func (pc *ProductController) SearchByName(c *gin.Context) {
+	title := c.Query("title")
+	if title == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Name parameter is missing"})
+		return
+	}
+	products, err := pc.productService.SearchByName(title)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to search for products"})
+		return
+	}
+	c.JSON(http.StatusOK, products)
+}
+
 func (pc ProductController) GetCommentsByProductId(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
 	if err != nil {
